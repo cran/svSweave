@@ -1,15 +1,14 @@
-"cleanLyxRnw" <-
-function (RnwCon, RnwCon2 = RnwCon)
+"cleanLyxRnw" <- function (RnwCon, RnwCon2 = RnwCon)
 {
 	# Read the data in the Rnw file
 	Rnw <- readLines(RnwCon)
 
 	# If the Rnw file is produced with LyX and SciViews Sweave module, chunks are
-	# separated by \Rchunk{<<[pars]>>= ... @}
+	# separated by \rchunk{<<[pars]>>= ... @}
 
 	# Beginning of R-Chunks (rewrite into <<[pars]>>=)
-	starts <- grepl("^\\\\Rchunk\\{<<.*>>=$", Rnw)
-	Rnw[starts] <- sub("^\\\\Rchunk\\{", "", Rnw[starts])
+	starts <- grepl("^\\\\rchunk\\{<<.*>>=$", Rnw)
+	Rnw[starts] <- sub("^\\\\rchunk\\{", "", Rnw[starts])
 
 	# End of R-Chunks (rewrite as @)
 	ends <- grepl("^@[ \t]*\\}$", Rnw)
