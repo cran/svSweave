@@ -1,5 +1,7 @@
-import(utils)
+import(utils, knitr)
 
 export(cleanLyxRnw,
+       knitLyxRnw,
+       purlLyxRnw,
        tangleLyxRnw,
        weaveLyxRnw)
