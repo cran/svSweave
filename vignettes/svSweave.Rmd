@@ -1,0 +1,81 @@
+---
+title: "svSweave - Sweave, Knitr and R Markdown Companion Functions"
+author: "Philippe Grosjean (phgrosjean@sciviews.org)"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{svSweave - Sweave, Knitr and R Markdown Companion Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The {svSweave} package provides different functions to better manage **Sweave** and **Knitr** with **LyX**, a document processor that creates LaTeX code. **These functions are deprecated** and are not detailed here. See their help page `?clean_lyx()`.
+
+The package also provides functions to automatically enumerate and reference figures, tables and equations in R Markdown documents (an alternate mechanisms to {bookdown} or {quarto} that works everywhere). Indeed, this feature is missing in the basic R Markdown documents. The various {bookdown} templates provide a `\@ref(label)`, see [bookdown cross references](https://bookdown.org/yihui/bookdown/cross-references.html) and Quarto simply uses `@label`, see [quarto cross references](https://quarto.org/docs/authoring/cross-references.html). The functions `fig()`, `tab()` and `eq()` provide a different mechanism to obtain a similar result: to enumerate items and to cross-reference them in the text. Here an example of a numbered figure with its caption. In order to use these function, you must load the {svSweave} package in a (setup) chunk before you use these functions:
+
+```{r}
+library(svSweave)
+```
+
+## Numbered figures
+
+You can use `fig("my caption text")` to number the caption of a figure in `fig.cap=`. The chunk must be named too.
+
+```{r hist, fig.cap=fig("An example of a simple histogram.")}
+hist(rnorm(50))
+```
+
+Now, you can reference this plot in the text using `fig$label` (see Fig `r fig$hist`). It also works if the first reference appears **before** the figure itself[^1], see Fig `r fig$boxplot`.
+
+[^1]: Take care, however, that numbering is sequential from the first call (either cross-reference, or label) in Word. You cannot cross-reference the last figure at the beginning of the document... or that last figure will be numbered "Fig. 1" there. For the other formats, it is not a problem.
+
+```{r boxplot, fig.cap=fig("A second plot as an example.")}
+boxplot(rnorm(50))
+```
+
+> Summary: produce numbered figures from labeled R chunks by indicating `fig.cap = fig("....")`, and reference them using `fig$label` in an inline R expression.
+
+## Numbered tables
+
+The same principle works for tables using `knitr::kable()`. For instance, see Table `r tab$head_iris`.
+
+```{r head_iris}
+knitr::kable(head(iris),
+  caption = tab("The few first lines of the `iris` dataset."))
+```
+
+A reference to `cars` (Table `r tab$head_cars`) and to `iris` (Table `r tab$head_iris`) again.
+
+```{r head_cars}
+knitr::kable(head(cars),
+  caption = tab("the first few lines of `cars`."), format = "pandoc")
+```
+
+> Summary: produce numbered tables from labeled R chunks by indicating `caption = tab("....")` in `knitr::kable()`, and reference them using `tab$label` in an inline R expression.
+
+## Numbered equations
+
+Finally, numbered display equations can also be constructed and cross-referenced. In the display equation, constructed with a pair of `$$`, you use `eq(label)` in an inline R expression. To reference it, you use `eq$label` also in an inline expression.
+
+$$x=\frac{-b \pm \sqrt{b^2 - 4ac}}{2a} `r eq(eqlabel)`$$
+
+... and I can reference Eq. `r eq$eqlabel` like this.
+
+$$\sum_{i = 0}^n{x^2} `r eq(sum)`$$
+
+I can cite one Eq `r eq$sum`, or another one Eq `r eq$pythagoras`.
+
+$$a^2+b^2=c^2 `r eq(pythagoras)`$$
+
+> Summary: produce numbered equations by adding `eq(label)` inline R expression *inside* a display equation, and reference to it using `eq$label` inside an inline R expression.
+
+**These tags work in R Markdown to compile HTML, LaTeX or Word, with some glitches remaining to eliminate for LaTeX or Word.**
